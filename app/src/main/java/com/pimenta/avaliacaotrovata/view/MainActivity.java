@@ -1,13 +1,17 @@
 package com.pimenta.avaliacaotrovata.view;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Bundle;
-
 import com.pimenta.avaliacaotrovata.R;
-import com.pimenta.avaliacaotrovata.model.Empresa;
+import com.pimenta.avaliacaotrovata.dao.EmpresasDAO;
+import com.pimenta.avaliacaotrovata.model.Empresas;
 import com.pimenta.avaliacaotrovata.recyclerView.RecyclerView_ListaEmpresas;
 
 import java.util.ArrayList;
@@ -17,8 +21,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerView_List
 
 
     private RecyclerView recyclerView;
-    private List<Empresa> empresas = new ArrayList<>();
     private RecyclerView_ListaEmpresas recyclerView_listaEmpresas;
+    private List<Empresas> empresas = new ArrayList<>();
 
 
     @Override
@@ -26,30 +30,42 @@ public class MainActivity extends AppCompatActivity implements RecyclerView_List
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        iniciarRecyclerView();
+        inicializarComponentes();
+
     }
 
-    private void iniciarRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
-        recyclerView_listaEmpresas = new RecyclerView_ListaEmpresas(getBaseContext(), empresas,
-                this);
+    private void inicializarComponentes() {
 
-        recyclerView.setAdapter(recyclerView_listaEmpresas);
+        recyclerView = findViewById(R.id.recyclerView_Database_EmpresasLista);
     }
 
     @Override
-    public void click_Empresa(Empresa empresa) {
+    public void click_empresa(Empresas empresas) {
+
+        Intent intent = new Intent(MainActivity.this, ProdutosActivity.class);
+//        intent.putExtra("tarefaSelecionada", tarefaSelecionada );
+        startActivity(intent);
 
     }
 
     @Override
     protected void onStart() {
+        listarEmpresas();
         super.onStart();
-        recuperarEmpresas();
     }
 
-    private void recuperarEmpresas() {
+    private void listarEmpresas() {
+
+        EmpresasDAO empresasDAO = new EmpresasDAO(getApplicationContext());
+        empresas = empresasDAO.listar();
+
+        recyclerView_listaEmpresas = new RecyclerView_ListaEmpresas(getBaseContext(), empresas,
+                this);
+
+         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(recyclerView_listaEmpresas);
 
     }
 }
